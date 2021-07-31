@@ -1,0 +1,41 @@
+Anforderungen:
+	Html mit Javascript (sollte in Chrome ausführbar sein [veraltete Browser müssen nicht unterstützt werden])
+	Html - nur für den Canvas und das importieren von Javascript (und allgemeine Grundstrucktur zB. title, meta)
+	Js - Das Spiel selbst sollte sich komplett auf dem Canvas abspielen
+	Enwicklungsumgebung ist frei wählbar
+	
+	Tic Tac Toe spielen können:
+		- gegen einen weiteren Spieler (wird mit der selben Maus gesteuert)
+		- gegen eine KI (diese sollte möglichts nicht verlieren [aber ohne einen Algorithmus, der alle möglichen Züge generiert])
+	
+	Tic Tac Toe:
+		- Ein 3x3 Feld auf das zwei Spieler abwechseln eine Markierung setzen
+		- Wer als erstes 3 Markierungen in einer Reihe hat gewinnt
+
+Zeit:
+	Tic Tac Toe: 21.09 - spätestens 05.10 (wir versuchen es bis zum 28.09 zu schaffen)
+	Deadline ca. 02.11
+
+Erweiterungen - Wenn wir wie geplant vor der Deadline fertig sind:
+	Erweiterung zur Arcade
+		-Arcade Menü
+			-Auswählen aus verschiedenen Spielen
+				-Spielmenge ist dynamisch
+			-Starten von Spielen über das Arcade Menü
+			-Nach beenden vom Spiel kommt man zurück ins Arcade Menü
+			
+		-Hinzufügen von weiteren Spielen
+			-Hinzufügen einer Game Klasse (da es in Js keine Interfaces gibt), um das Grundgerüßt zu geben
+			-Anpassen des Tic Tac Toe Spiels mit der Game Klassse
+			-Bsp.: Minesweeper
+	
+	Optimirung von Code bzw. Auslagerung von mehrfachverwendeten Komponenten
+		-Click in Rect - als util Funktion
+	
+	Documentierung - JsDoc
+		-mit /** und @description, @type, @param usw. 
+
+Informationen:
+	index.html öffnen!
+	Canvas muss quadratisch sein
+	Canvas braucht eine gewisse mindestgröße
