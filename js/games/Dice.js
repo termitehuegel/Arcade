@@ -273,7 +273,6 @@ class Dice extends Game{
         //draws play button
         this.context.fillStyle = '#bbb';
         this.context.fillRect(0, this.canvas.height*2/3 - 30, this.canvas.width, 40);
-;
 
         //draws back to arcade menu button
         this.context.fillRect(0, this.canvas.height-50, 80, 50);

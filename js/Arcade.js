@@ -23,7 +23,7 @@ class Arcade {
     /**
      * @type{int}
      */
-    updateIntervall;
+    updateInterval;
 
     /**
      * @constructor
@@ -143,7 +143,7 @@ class Arcade {
         //creates the game - the parameter arcade is only to stop the game in the end -> the game should never do any thing else with it
         game = new this.games[this.index](this.canvas, this.context, this);
         //sets the field updateIntervall to the Intervall that updates the game
-        this.updateIntervall = setInterval(function () {
+        this.updateInterval = setInterval(function () {
             //is called to update the game
             game.update()
         }, 100);
@@ -155,7 +155,7 @@ class Arcade {
      */
     end() {
         //ends the game updated
-        clearInterval(this.updateIntervall);
+        clearInterval(this.updateInterval);
         //draws the arcade menu
         this.draw();
         //activates arcade inputs
