@@ -1,3 +1,48 @@
+function arcadeClickEventHandler(e) {
+    let rect = canvas.getBoundingClientRect();
+    ctx.font = canvas.height/10 + 'px Arial';
+    if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 0, canvas.height*2/3, canvas.width, canvas.height/30)) {
+        arcade.play();
+    } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, canvas.width - ctx.measureText('→').width, canvas.height*2/5 - canvas.height/17, ctx.measureText('→').width,canvas.height/15)) {
+        arcade.changeGame(1);
+    } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top,0, canvas.height*2/5 - canvas.height/17, ctx.measureText('←').width, canvas.height/15)) {
+        arcade.changeGame(-1);
+    }
+}
+
+function arcadeResizeEventHandler() {
+   arcade.draw();
+}
+
+function arcadeKeyEventHandler(e) {
+    switch (e.key) {
+        case 'D':
+            arcade.changeGame(1);
+            break;
+        case 'd':
+            arcade.changeGame(1);
+            break;
+        case 'ArrowRight':
+            arcade.changeGame(1);
+            break;
+        case 'A':
+            arcade.changeGame(-1);
+            break;
+        case 'a':
+            arcade.changeGame(-1);
+            break;
+        case 'ArrowLeft':
+            arcade.changeGame(-1);
+            break;
+        case 'Enter':
+            arcade.play();
+            break;
+        case ' ':
+            arcade.play();
+            break;
+    }
+}
+
 /**
  * @property {Game[]} games
  * @property {HTMLCanvasElement} canvas
@@ -37,49 +82,9 @@ class Arcade {
         this.canvas = canvas;
         this.context = context;
 
-        canvas.addEventListener("click", function(e){
-            if (!blockblockListenersArcade) {
-                let rect = canvas.getBoundingClientRect();
-                if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 0, canvas.height*2/3 - 30, canvas.width, 40)) {
-                    arcade.play();
-                } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, canvas.width - 75, canvas.height * 2 / 5 - 35, 75, 35)) {
-                    arcade.changeGame(1);
-                } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top,0, canvas.height * 2 / 5 - 35, 75, 35)) {
-                    arcade.changeGame(-1);
-                }
-            }
-        });
-
-        document.addEventListener('keyup', function (e) {
-            if (!blockblockListenersArcade) {
-                switch (e.key) {
-                    case 'D':
-                        arcade.changeGame(1);
-                        break;
-                    case 'd':
-                        arcade.changeGame(1);
-                        break;
-                    case 'ArrowRight':
-                        arcade.changeGame(1);
-                        break;
-                    case 'A':
-                        arcade.changeGame(-1);
-                        break;
-                    case 'a':
-                        arcade.changeGame(-1);
-                        break;
-                    case 'ArrowLeft':
-                        arcade.changeGame(-1);
-                        break;
-                    case 'Enter':
-                        arcade.play();
-                        break;
-                    case ' ':
-                        arcade.play();
-                        break;
-                }
-            }
-        });
+        canvas.addEventListener('click', arcadeClickEventHandler);
+        document.addEventListener('keyup', arcadeKeyEventHandler);
+        window.addEventListener('resize', arcadeResizeEventHandler);
     }
 
     /**
@@ -89,32 +94,33 @@ class Arcade {
         //clears the canvas
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+
+
         //draws header
-        this.context.font = '50px Arial';
+        this.context.font = this.canvas.height/15 + 'px Arial';
         this.context.fillStyle = '#000';
         this.context.textAlign = 'center';
-        this.context.fillText(this.games[this.index].name, this.canvas.width/2, 50, this.canvas.width);
+        this.context.fillText(this.games[this.index].name, this.canvas.width/2, this.canvas.height/15, this.canvas.width);
 
         //draws play button
+        this.context.font = this.canvas.height/30 + 'px Arial';
         this.context.fillStyle = '#bbb';
-        this.context.fillRect(0, this.canvas.height*2/3 - 30, this.canvas.width, 40);
-
+        this.context.fillRect(0, this.canvas.height*2/3, this.canvas.width, this.canvas.height/30);
         //draws play button text
-        this.context.font = '25px Arial';
         this.context.fillStyle = '#000';
-        this.context.fillText('Spielen', this.canvas.width/2, this.canvas.height*2/3, this.canvas.width);
+        this.context.fillText('Play', this.canvas.width/2, this.canvas.height*2/3 + this.canvas.height/37, this.canvas.width);
 
         //draws arrow right
         if (typeof this.games[this.index + 1] !== 'undefined') {
             this.context.textAlign = 'right';
-            this.context.font = '75px Arial';
+            this.context.font = this.canvas.height/10 + 'px Arial';
             this.context.fillText('→', this.canvas.width, this.canvas.height * 2 / 5);
         }
 
         //draws arrow left
         if (typeof this.games[this.index - 1] !== 'undefined') {
             this.context.textAlign = 'left';
-            this.context.font = '75px Arial';
+            this.context.font = this.canvas.height/10 + 'px Arial';
             this.context.fillText('←', 0, this.canvas.height * 2 / 5);
         }
     }
@@ -138,11 +144,13 @@ class Arcade {
      * @constructs Game
      */
     play() {
-        //blocks the Click listender of the Arcade
-        blockblockListenersArcade = true;
+        //removes Arcade Event Handlers while game is running
+        canvas.removeEventListener('click', arcadeClickEventHandler);
+        document.removeEventListener('keyup', arcadeKeyEventHandler);
+        window.removeEventListener('resize', arcadeResizeEventHandler);
         //creates the game - the parameter arcade is only to stop the game in the end -> the game should never do any thing else with it
         game = new this.games[this.index](this.canvas, this.context, this);
-        //sets the field updateIntervall to the Intervall that updates the game
+        //sets the field updateInterval to the Interval that updates the game
         this.updateInterval = setInterval(function () {
             //is called to update the game
             game.update()
@@ -159,7 +167,9 @@ class Arcade {
         //draws the arcade menu
         this.draw();
         //activates arcade inputs
-        blockblockListenersArcade = false;
-        document.title = 'Arcade - Menü';
+        canvas.addEventListener('click', arcadeClickEventHandler);
+        document.addEventListener('keyup', arcadeKeyEventHandler);
+        window.addEventListener('resize', arcadeResizeEventHandler);
+        document.title = 'Arcade - Menu';
     }
 }
