@@ -5,6 +5,6 @@ let blockblockListenersArcade = false;
 //global variable because it is used in listeners
 let game;
 //name needs to be arcade because of listeners
-let arcade = new Arcade([TicTacToe, Minesweeper, Dice], canvas, ctx);
+let arcade = new Arcade([TicTacToe, Minesweeper, Dice, Snake], canvas, ctx);
 //draws the arcade menu for the first time
 arcade.draw();
