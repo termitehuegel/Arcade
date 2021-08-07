@@ -1,48 +1,3 @@
-function arcadeClickEventHandler(e) {
-    let rect = canvas.getBoundingClientRect();
-    ctx.font = canvas.height/10 + 'px Arial';
-    if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 0, canvas.height*2/3, canvas.width, canvas.height/30)) {
-        arcade.play();
-    } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, canvas.width - ctx.measureText('→').width, canvas.height*2/5 - canvas.height/17, ctx.measureText('→').width,canvas.height/15)) {
-        arcade.changeGame(1);
-    } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top,0, canvas.height*2/5 - canvas.height/17, ctx.measureText('←').width, canvas.height/15)) {
-        arcade.changeGame(-1);
-    }
-}
-
-function arcadeResizeEventHandler() {
-   arcade.draw();
-}
-
-function arcadeKeyEventHandler(e) {
-    switch (e.key) {
-        case 'D':
-            arcade.changeGame(1);
-            break;
-        case 'd':
-            arcade.changeGame(1);
-            break;
-        case 'ArrowRight':
-            arcade.changeGame(1);
-            break;
-        case 'A':
-            arcade.changeGame(-1);
-            break;
-        case 'a':
-            arcade.changeGame(-1);
-            break;
-        case 'ArrowLeft':
-            arcade.changeGame(-1);
-            break;
-        case 'Enter':
-            arcade.play();
-            break;
-        case ' ':
-            arcade.play();
-            break;
-    }
-}
-
 /**
  * @property {Game[]} games
  * @property {HTMLCanvasElement} canvas
@@ -82,9 +37,54 @@ class Arcade {
         this.canvas = canvas;
         this.context = context;
 
-        canvas.addEventListener('click', arcadeClickEventHandler);
-        document.addEventListener('keyup', arcadeKeyEventHandler);
-        window.addEventListener('resize', arcadeResizeEventHandler);
+        canvas.addEventListener('click', this.clickEventHandler);
+        document.addEventListener('keyup', this.keyEventHandler);
+        window.addEventListener('resize', this.resizeEventHandler);
+    }
+
+    clickEventHandler(e) {
+        let rect = canvas.getBoundingClientRect();
+        ctx.font = canvas.height/10 + 'px Arial';
+        if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 0, canvas.height*2/3, canvas.width, canvas.height/30)) {
+            arcade.play();
+        } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, canvas.width - ctx.measureText('→').width, canvas.height*2/5 - canvas.height/17, ctx.measureText('→').width,canvas.height/15)) {
+            arcade.changeGame(1);
+        } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top,0, canvas.height*2/5 - canvas.height/17, ctx.measureText('←').width, canvas.height/15)) {
+            arcade.changeGame(-1);
+        }
+    }
+
+    resizeEventHandler(e) {
+        arcade.draw();
+    }
+
+    keyEventHandler(e) {
+        switch (e.key) {
+            case 'D':
+                arcade.changeGame(1);
+                break;
+            case 'd':
+                arcade.changeGame(1);
+                break;
+            case 'ArrowRight':
+                arcade.changeGame(1);
+                break;
+            case 'A':
+                arcade.changeGame(-1);
+                break;
+            case 'a':
+                arcade.changeGame(-1);
+                break;
+            case 'ArrowLeft':
+                arcade.changeGame(-1);
+                break;
+            case 'Enter':
+                arcade.play();
+                break;
+            case ' ':
+                arcade.play();
+                break;
+        }
     }
 
     /**
@@ -93,8 +93,6 @@ class Arcade {
     draw() {
         //clears the canvas
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-
 
         //draws header
         this.context.font = this.canvas.height/15 + 'px Arial';
@@ -145,9 +143,9 @@ class Arcade {
      */
     play() {
         //removes Arcade Event Handlers while game is running
-        canvas.removeEventListener('click', arcadeClickEventHandler);
-        document.removeEventListener('keyup', arcadeKeyEventHandler);
-        window.removeEventListener('resize', arcadeResizeEventHandler);
+        canvas.removeEventListener('click', this.clickEventHandler);
+        document.removeEventListener('keyup', this.keyEventHandler);
+        window.removeEventListener('resize', this.resizeEventHandler);
         //creates the game - the parameter arcade is only to stop the game in the end -> the game should never do any thing else with it
         game = new this.games[this.index](this.canvas, this.context, this);
         //sets the field updateInterval to the Interval that updates the game
@@ -167,9 +165,9 @@ class Arcade {
         //draws the arcade menu
         this.draw();
         //activates arcade inputs
-        canvas.addEventListener('click', arcadeClickEventHandler);
-        document.addEventListener('keyup', arcadeKeyEventHandler);
-        window.addEventListener('resize', arcadeResizeEventHandler);
+        canvas.addEventListener('click', this.clickEventHandler);
+        document.addEventListener('keyup', this.keyEventHandler);
+        window.addEventListener('resize', this.resizeEventHandler);
         document.title = 'Arcade - Menu';
     }
 }
