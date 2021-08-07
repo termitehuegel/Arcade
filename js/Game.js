@@ -26,16 +26,13 @@ class Game {
         this.canvas = canvas;
         this.context = context;
         this.arcade = arcade;
-        //init event handlers
-        document.addEventListener('keydown', this.keyEventHandler);
-        canvas.addEventListener('click', this.clickEventHandler);
+        this.registerEventHandlers();
     }
 
     /**
      * @description is called every 100ms to update the game
      */
     update() {
-
         this.draw();
     }
 
@@ -43,12 +40,13 @@ class Game {
      * @description used to end the game
      */
     end() {
-        document.removeEventListener('keydown', this.keyEventHandler);
-        canvas.removeEventListener('click', this.clickEventHandler);
+        this.unloadEventHandlers();
         this.arcade.end();
     }
 
-    startGame() {}
+    startGame() {
+        this.status = true;
+    }
 
     draw() {
         //clears the canvas
@@ -99,10 +97,24 @@ class Game {
                     case 'Escape':
                         game.end();
                         break;
+                    case 'Enter':
+                        game.startGame();
+                        break;
+                    case ' ':
+                        game.startGame();
+                        break;
                 }
             }
         }
     }
 
+    registerEventHandlers() {
+        document.addEventListener('keydown', this.keyEventHandler);
+        this.canvas.addEventListener('click', this.clickEventHandler);
+    }
 
+    unloadEventHandlers() {
+        document.removeEventListener('keydown', this.keyEventHandler);
+        this.canvas.removeEventListener('click', this.clickEventHandler);
+    }
 }
