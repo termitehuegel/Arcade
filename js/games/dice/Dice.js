@@ -1,3 +1,7 @@
+/**
+ * @author termitehuegel
+ * @extends Game
+ */
 class Dice extends Game {
     static name = "Dice";
     playerNumber;
@@ -18,11 +22,17 @@ class Dice extends Game {
         super.update();
     }
 
+    /**
+     * @description rolls the dies
+     */
     roll() {
         this.playerNumber = generateRandomNumberInRange(6, 1);
         this.aiNumber = generateRandomNumberInRange(6, 1);
     }
 
+    /**
+     * @description stopps the dies
+     */
     stop() {
         this.stopped = true;
         this.roll();
@@ -31,6 +41,10 @@ class Dice extends Game {
         }, 700);
     }
 
+    /**
+     * @description calculates the winning message
+     * @returns {string}
+     */
     winner() {
         if (this.playerNumber > this.aiNumber) {
             return 'You Win!';

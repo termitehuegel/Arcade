@@ -42,6 +42,10 @@ class Arcade {
         window.addEventListener('resize', this.resizeEventHandler);
     }
 
+    /**
+     * @description mouse event handler
+     * @param e {MouseEvent}
+     */
     clickEventHandler(e) {
         let rect = canvas.getBoundingClientRect();
         ctx.font = canvas.height/10 + 'px Arial';
@@ -54,10 +58,18 @@ class Arcade {
         }
     }
 
+    /**
+     * @description handles the resizing of the window
+     * @param e {Event}
+     */
     resizeEventHandler(e) {
         arcade.draw();
     }
 
+    /**
+     * @description handles keyboard events
+     * @param e {KeyboardEvent}
+     */
     keyEventHandler(e) {
         switch (e.key) {
             case 'D':

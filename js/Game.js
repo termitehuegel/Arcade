@@ -37,17 +37,23 @@ class Game {
     }
 
     /**
-     * @description used to end the game
+     * @description used to end the game and return to arcade
      */
     end() {
         this.unloadEventHandlers();
         this.arcade.end();
     }
 
+    /**
+     * @description starts the game
+     */
     startGame() {
         this.status = true;
     }
 
+    /**
+     * @description draws the game or Menu
+     */
     draw() {
         //clears the canvas
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -58,8 +64,14 @@ class Game {
         }
     }
 
+    /**
+     * @description draws the Game
+     */
     drawGame() {}
 
+    /**
+     * @description draws the Menu
+     */
     drawMenu() {
         //draws header
         this.context.font = this.canvas.height/15 + 'px Arial';
@@ -77,6 +89,10 @@ class Game {
         this.context.fillText('Back', 2, this.canvas.height - this.canvas.height/100, this.canvas.width);
     }
 
+    /**
+     * @description handles mouse events
+     * @param e {MouseEvent}
+     */
     clickEventHandler(e) {
         if (!game.status) {
             let rect = canvas.getBoundingClientRect();
@@ -87,6 +103,10 @@ class Game {
         }
     }
 
+    /**
+     * @description handles keyboard events
+     * @param e {KeyboardEvent}
+     */
     keyEventHandler(e) {
         if (!game.status) {
             if (e.key) {
