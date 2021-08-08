@@ -127,7 +127,7 @@ class TicTacToe extends Game {
                     case 2:
                         this.context.drawImage(this.circle, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                         this.context.drawImage(this.circle, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width / 200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
-                        this.context.drawImage(this.circle, this.canvas.width/3*0 + this.canvas.width/200, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                        this.context.drawImage(this.circle, this.canvas.width / 200, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                         break;
                 }
                 return;
@@ -144,7 +144,6 @@ class TicTacToe extends Game {
             }
             this.playerTurn = !this.playerTurn;
             this.checkForEndOfGame();
-            console.log(this.win);
             if (this.win !== '') {
                 setTimeout(function () {
                     game.status = false;
@@ -201,7 +200,7 @@ class TicTacToe extends Game {
     }
 
     checkForEndOfGame() {
-        let winner = this.getWinner();
+        let winner = this.getWinner(this.field);
         if (winner !== 0) {
             if (this.ai) {
                 if (winner === 1) {
@@ -212,18 +211,18 @@ class TicTacToe extends Game {
             } else {
                 this.win = "Player " + winner + " Wins!";
              }
-        } else if (this.getFreeTiles().length === 0) {
+        } else if (this.getFreeTiles(this.field).length === 0) {
             this.win = "Tie!";
-        } else if (this.ai && !this.playersTurn) {
+        } else if (this.ai && !this.playerTurn) {
             this.aiTurn();
         }
     }
 
-    getFreeTiles() {
+    getFreeTiles(field) {
         let freeTiles = [];
-        for (let y = 0; y<this.field.length; y++){
-            for (let x = 0; x<this.field[y].length; x++) {
-                if (this.field[y][x] === 0) {
+        for (let y = 0; y<field.length; y++){
+            for (let x = 0; x<field[y].length; x++) {
+                if (field[y][x] === 0) {
                     freeTiles.push({x: x, y: y});
                 }
             }
@@ -231,23 +230,23 @@ class TicTacToe extends Game {
         return freeTiles;
     }
 
-    getWinner() {
+    getWinner(field) {
         for (let p=1; p<3; p++){
-            for (let y=0; y<this.field.length; y++) {
-                if (this.field[y][0] === p && this.field[y][1] === p && this.field[y][2] === p) {
+            for (let y=0; y<field.length; y++) {
+                if (field[y][0] === p && field[y][1] === p && field[y][2] === p) {
                     return p;
                 }
             }
 
-            for (let x=0; x<this.field.length; x++) {
-                if (this.field[0][x] === p && this.field[1][x] === p && this.field[2][x] === p) {
+            for (let x=0; x<field.length; x++) {
+                if (field[0][x] === p && field[1][x] === p && field[2][x] === p) {
                     return p;
                 }
             }
 
-            if (this.field[0][0] === p && this.field[1][1] === p && this.field[2][2] === p) {
+            if (field[0][0] === p && field[1][1] === p && field[2][2] === p) {
                 return p;
-            } else if (this.field[0][2] === p && this.field[1][1] === p && this.field[2][0] === p) {
+            } else if (field[0][2] === p && field[1][1] === p && field[2][0] === p) {
                 return p;
             }
 
@@ -256,6 +255,61 @@ class TicTacToe extends Game {
     }
 
     aiTurn() {
-        //TODO MIN MAX
+        let free = this.getFreeTiles(this.field);
+        let maxScore = -2;
+        let move;
+        for (let i=0; i<free.length; i++) {
+            let field = cloneTwoDimensionalArray(this.field);
+            field[free[i].y][free[i].x] = 2;
+            let score = this.miniMax(field, false);
+            field[free[i].y][free[i].x] = 0;
+            if (score > maxScore) {
+                maxScore = score;
+                move = free[i];
+            }
+        }
+        console.log(maxScore);
+        this.checkField(move.x, move.y);
+    }
+
+    miniMax(field, max) {
+        let winner = this.getWinner(field);
+        let free = this.getFreeTiles(field);
+        let maxScore = -2;
+        let minScore = 2;
+        if (winner !== 0) {
+            if (winner === 1) {
+                return -1;
+            } else {
+                return 1;
+            }
+        } else if (free.length === 0) {
+            return 0;
+        }
+        let field2 = cloneTwoDimensionalArray(field);
+
+        if (max) {
+            for (let i=0; i<free.length; i++) {
+                field2[free[i].y][free[i].x] = 2;
+                let score = this.miniMax(field2, false);
+                field2[free[i].y][free[i].x] = 0;
+                if (score > maxScore) {
+                    maxScore = score;
+                }
+            }
+            //console.log('max', maxScore);
+            return maxScore;
+        } else {
+            for (let i=0; i<free.length; i++) {
+                field2[free[i].y][free[i].x] = 1;
+                let score = this.miniMax(field2, true);
+                field2[free[i].y][free[i].x] = 0;
+                if (score < minScore) {
+                    minScore = score;
+                }
+            }
+            //console.log('min', minScore);
+            return minScore;
+        }
     }
 }

@@ -21,3 +21,11 @@ function clickInRect(clickX, clickY, rectX, rectY, rectWidth, rectHeight) {
 function generateRandomNumberInRange(maximum, minimum) {
 	return Math.floor(Math.random() * Math.floor(maximum) + minimum);
 }
+
+function cloneTwoDimensionalArray(array) {
+    let result = [];
+    for (let i=0; i<array.length; i++) {
+        result[i] = [...array[i]];
+    }
+    return result;
+}
