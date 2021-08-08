@@ -27,6 +27,8 @@ class Game {
         this.context = context;
         this.arcade = arcade;
         this.registerEventHandlers();
+        this.loadImages();
+        this.loadSounds();
     }
 
     /**
@@ -88,6 +90,16 @@ class Game {
         this.context.textAlign = 'left';
         this.context.fillText('Back', 2, this.canvas.height - this.canvas.height/100, this.canvas.width);
     }
+
+    /**
+     * @description loads the images
+     */
+    loadImages() {}
+
+    /**
+     * @description loads sounds
+     */
+    loadSounds() {}
 
     /**
      * @description handles mouse events

@@ -60,7 +60,7 @@ class TicTacToe extends Game{
      */
     inGame = false;
     /**
-     * @type {int}
+     * @type {number}
      */
     playersTurn;
     /**
