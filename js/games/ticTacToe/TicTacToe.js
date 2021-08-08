@@ -1,208 +1,73 @@
-/**
- * @description the event handler for a tic tac toe game
- * @param {MouseEvent} e
- */
-function ticTacToeClickHandler(e) {
-    let rect = canvas.getBoundingClientRect();
-    if (!game.inGame) {
-        if (game.time == null|| game.time < Date.now() - 750) {
-            if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 0, canvas.height - 50, 80, 50)) {
-                game.end();
-            } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 0, canvas.height * 2 / 3 - 30, canvas.width, 40)) {
-                game.startGame(false);
-            } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 0, canvas.height * 5 / 6 - 30, canvas.width, 40)) {
-                game.startGame(true);
-            }
-        }
-    } else {
-        if (game.ki && game.playersTurn !== 1) {
-            return;
-        }
-        for (let y=0; y<game.field.length; y++) {
-            for (let x=0; x<game.field[y].length; x++) {
-                if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 2+102*x, 2+102*y, 100, 100)) {
-                    game.checkField(x, y);
-                    break;
-                }
-            }
-        }
-    }
-}
+//TODO Documentation and Comments
 
-/**
- * @description the keypressEventHandler for tic tac toe
- * @param {KeyboardEvent} e
- */
-function ticTacToeKeyHandler(e) {
-    if (!game.inGame) {
-        switch (e.key) {
-            case 'Backspace':
-                game.end();
-                break;
-            case 'Escape':
-                game.end();
-                break;
-        }
-    }
-}
-
-/**
- * @extends Game
- */
-class TicTacToe extends Game{
-
-    /**
-     * @type {string}
-     */
+class TicTacToe extends Game {
     static name = 'Tic Tac Toe';
-    /**
-     * @type {boolean}
-     */
-    inGame = false;
-    /**
-     * @type {number}
-     */
-    playersTurn;
-    /**
-     * @type {int[][]}
-     */
+    playerTurn;
     field;
-    /**
-     * @type {number|null}
-     */
-    time = null;
-    /**
-     * @type {int|null}
-     */
-    win = null;
-    /**
-     * @type {boolean}
-     */
-    ki;
+    win = '';
+    ai;
 
-
-    /**
-     * @constructor
-     * @param {HTMLCanvasElement} canvas
-     * @param {CanvasRenderingContext2D} context
-     * @param {Arcade} arcade
-     */
-    constructor(canvas, context, arcade) {
-        //constructs a Game Object
-        super(canvas, context, arcade);
-        //initialises the click listener
-        this.canvas.addEventListener('click', ticTacToeClickHandler);
-        document.addEventListener('keyup', ticTacToeKeyHandler);
-        //initialises the images
-        this.cross = new Image(100, 100);
-        this.cross.src = './img/cross.png';
-        this.circle = new Image(100, 100);
-        this.circle.src = './img/circle.png';
+    startGame(ai = false) {
+        this.playerTurn = true;
+        this.field = [[0, 0, 0],[0, 0, 0],[0, 0, 0]];
+        this.ai = ai;
+        this.win = '';
+        super.startGame();
     }
 
-    /**
-     * @description ends the Tic Tac Toe game
-     */
-    end() {
-        //removes the tic tac toe event listener
-        this.canvas.removeEventListener('click', ticTacToeClickHandler);
-        document.removeEventListener('keyup', ticTacToeKeyHandler);
-        //ends the game - by calling the Game object
-        super.end();
+    loadImages() {
+        this.circle = new Image(this.canvas.width, this.canvas.width);
+        this.circle.src = './img/ticTacToe/circle.png';
+        this.cross = new Image(this.canvas.width, this.canvas.width);
+        this.cross.src = './img/ticTacToe/cross.png';
+        super.loadImages();
     }
 
-    /**
-     * @description is called every 100ms to update the game
-     */
-    update() {
-        if (this.inGame || this.time > Date.now() - 700) {
-            //draws the Field
-            this.drawGame();
-        } else {
-            //draws the Game Menu
-            this.drawMenu();
-        }
-    }
-
-    /**
-     * @description starts a new Tic Tac Toe game
-     * @param  {boolean} ki
-     */
-    startGame(ki) {
-        this.ki = ki;
-        this.playersTurn = 1;
-        this.field = [[0,0,0],[0,0,0],[0,0,0]];
-        this.inGame = true;
-    }
-
-    /**
-     * @description markes the tile with the according symbol
-     * @param {int} x x-Coordinate of the tile
-     * @param {int} y y-Coordinate of the tile
-     */
-    checkField(x, y) {
-        //marks the field
-        if (this.field[y][x] === 0) {
-            this.field[y][x] = this.playersTurn;
-            //changes to the other player
-            if (this.playersTurn === 1) {
-                this.playersTurn = 2;
-            } else {
-                this.playersTurn = 1;
-            }
-            //checks if the game has ended because of the move made
-            this.checkEnd();
-        }
-    }
-
-    /**
-     * @description draws the game/field in the current state
-     */
     drawGame() {
-        //clears the canvas
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        super.drawGame();
 
         for (let y=0; y<this.field.length; y++) {
             for (let x=0; x<this.field[y].length; x++) {
                 //draws the grey squares
                 this.context.fillStyle = '#ccc';
-                this.context.fillRect(2 + 102*x, 2+ 102*y, 100, 100);
+                this.context.fillRect(this.canvas.width/3*x + this.canvas.width/200, this.canvas.width/3*y + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                 //draws green squares if a player has won
-                if (this.win > 0) {
+                if (this.win !== '') {
                     this.drawWin();
                 }
                 //draws the according symbol on the tile
                 if (this.field[y][x] === 1) {
-                    this.context.drawImage(this.cross, 2 + 102*x, 2+ 102*y, 100, 100);
+                    this.context.fillStyle = '#00f';
+                    //this.context.fillRect(this.canvas.width/3*x + this.canvas.width/200, this.canvas.width/3*y + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                    this.context.drawImage(this.cross, this.canvas.width/3*x + this.canvas.width/200, this.canvas.width/3*y + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                 } else if (this.field[y][x] === 2) {
-                    this.context.drawImage(this.circle, 2 + 102 * x, 2 + 102 * y, 100, 100);
+                    this.context.fillStyle = '#0f0';
+                    //this.context.fillRect(this.canvas.width/3*x + this.canvas.width/200, this.canvas.width/3*y + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                    this.context.drawImage(this.circle, this.canvas.width/3*x + this.canvas.width/200, this.canvas.width/3*y + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                 }
             }
         }
     }
 
-    /**
-     * @description draws the winning tiles green
-     */
     drawWin() {
         for (let p=1; p<3; p++){
             //checks rows
             for (let y=0; y<this.field.length; y++) {
                 if (this.field[y][0] === p && this.field[y][1] === p && this.field[y][2] === p) {
                     this.context.fillStyle = '#0f0';
-                    this.context.fillRect(2, 2+ 102*y, 100, 100);
-                    this.context.fillRect(104, 2+ 102*y, 100, 100);
-                    this.context.fillRect(206, 2+ 102*y, 100, 100);
+                    this.context.fillRect(this.canvas.width / 200, this.canvas.width/3*y + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                    this.context.fillRect(this.canvas.width / 3 + this.canvas.width/200, this.canvas.width/3*y + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                    this.context.fillRect(this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3*y + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                     switch (p) {
                         case 1:
-                            this.context.drawImage(this.cross, 2, 2+ 102*y, 100, 100);
-                            this.context.drawImage(this.cross, 104, 2+ 102*y, 100, 100);
-                            this.context.drawImage(this.cross, 206, 2+ 102*y, 100, 100);
+                            this.context.drawImage(this.cross, this.canvas.width / 200, this.canvas.width/3*y + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                            this.context.drawImage(this.cross, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width/3*y + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                            this.context.drawImage(this.cross, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3*y + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                             break;
                         case 2:
-                            this.context.drawImage(this.circle, 2, 2+ 102*y, 100, 100);
-                            this.context.drawImage(this.circle, 104, 2+ 102*y, 100, 100);
-                            this.context.drawImage(this.circle, 206, 2+ 102*y, 100, 100);
+                            this.context.drawImage(this.circle, this.canvas.width / 200, this.canvas.width/3*y + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                            this.context.drawImage(this.circle, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width/3*y + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                            this.context.drawImage(this.circle, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3*y + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                             break;
                     }
                     return;
@@ -212,19 +77,19 @@ class TicTacToe extends Game{
             for (let x=0; x<this.field.length; x++) {
                 if (this.field[0][x] === p && this.field[1][x] === p && this.field[2][x] === p) {
                     this.context.fillStyle = '#0f0';
-                    this.context.fillRect(2 + 102*x, 2, 100, 100);
-                    this.context.fillRect(2 + 102*x, 104, 100, 100);
-                    this.context.fillRect(2 + 102*x, 206, 100, 100);
+                    this.context.fillRect(this.canvas.width/3*x + this.canvas.width/200, this.canvas.width / 200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                    this.context.fillRect(this.canvas.width/3*x + this.canvas.width/200, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                    this.context.fillRect(this.canvas.width/3*x + this.canvas.width/200, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                     switch (p) {
                         case 1:
-                            this.context.drawImage(this.cross, 2 + 102*x, 2, 100, 100);
-                            this.context.drawImage(this.cross, 2 + 102*x, 104, 100, 100);
-                            this.context.drawImage(this.cross, 2 + 102*x, 206, 100, 100);
+                            this.context.drawImage(this.cross, this.canvas.width/3*x + this.canvas.width/200, this.canvas.width / 200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                            this.context.drawImage(this.cross, this.canvas.width/3*x + this.canvas.width/200, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                            this.context.drawImage(this.cross, this.canvas.width/3*x + this.canvas.width/200, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                             break;
                         case 2:
-                            this.context.drawImage(this.circle, 2 + 102*x, 2, 100, 100);
-                            this.context.drawImage(this.circle, 2 + 102*x, 104, 100, 100);
-                            this.context.drawImage(this.circle, 2 + 102*x, 206, 100, 100);
+                            this.context.drawImage(this.circle, this.canvas.width/3*x + this.canvas.width/200, this.canvas.width / 200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                            this.context.drawImage(this.circle, this.canvas.width/3*x + this.canvas.width/200, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                            this.context.drawImage(this.circle, this.canvas.width/3*x + this.canvas.width/200, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                             break;
                     }
                     return;
@@ -233,38 +98,38 @@ class TicTacToe extends Game{
             //checks diagonal 1
             if (this.field[0][0] === p && this.field[1][1] === p && this.field[2][2] === p) {
                 this.context.fillStyle = '#0f0';
-                this.context.fillRect(2, 2, 100, 100);
-                this.context.fillRect(104, 104, 100, 100);
-                this.context.fillRect(206, 206, 100, 100);
+                this.context.fillRect(this.canvas.width / 200, this.canvas.width / 200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                this.context.fillRect(this.canvas.width / 3 + this.canvas.width/200, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                this.context.fillRect(this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                 switch (p) {
                     case 1:
-                        this.context.drawImage(this.cross, 2, 2, 100, 100);
-                        this.context.drawImage(this.cross, 104,104, 100, 100);
-                        this.context.drawImage(this.cross, 206, 206, 100, 100);
+                        this.context.drawImage(this.cross, this.canvas.width / 200, this.canvas.width / 200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                        this.context.drawImage(this.cross, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                        this.context.drawImage(this.cross, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                         break;
                     case 2:
-                        this.context.drawImage(this.circle, 2, 2, 100, 100);
-                        this.context.drawImage(this.circle, 104, 104, 100, 100);
-                        this.context.drawImage(this.circle, 206, 206, 100, 100);
+                        this.context.drawImage(this.circle, this.canvas.width / 200, this.canvas.width / 200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                        this.context.drawImage(this.circle, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                        this.context.drawImage(this.circle, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                         break;
                 }
                 return;
                 //checks diagonal 2
             } else if (this.field[0][2] === p && this.field[1][1] === p && this.field[2][0] === p) {
                 this.context.fillStyle = '#0f0';
-                this.context.fillRect(206, 2, 100, 100);
-                this.context.fillRect(104, 104, 100, 100);
-                this.context.fillRect(2, 206, 100, 100);
+                this.context.fillRect(this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width / 200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                this.context.fillRect(this.canvas.width / 3 + this.canvas.width/200, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                this.context.fillRect(this.canvas.width / 200, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                 switch (p) {
                     case 1:
-                        this.context.drawImage(this.cross, 104, 104, 100, 100);
-                        this.context.drawImage(this.cross, 206, 2, 100, 100);
-                        this.context.drawImage(this.cross, 2, 206, 100, 100);
+                        this.context.drawImage(this.cross, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                        this.context.drawImage(this.cross, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width / 200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                        this.context.drawImage(this.cross, this.canvas.width / 200, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                         break;
                     case 2:
-                        this.context.drawImage(this.circle, 104, 104, 100, 100);
-                        this.context.drawImage(this.circle, 206, 2, 100, 100);
-                        this.context.drawImage(this.circle, 2, 206, 100, 100);
+                        this.context.drawImage(this.circle, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width / 3 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                        this.context.drawImage(this.circle, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width / 200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
+                        this.context.drawImage(this.circle, this.canvas.width / 200, this.canvas.width/3*2 + this.canvas.width/200, this.canvas.width/3 - this.canvas.width/100, this.canvas.width/3 - this.canvas.width/100);
                         break;
                 }
                 return;
@@ -272,263 +137,94 @@ class TicTacToe extends Game{
         }
     }
 
-    /**
-     * @description draws the Game Menu
-     */
-    drawMenu() {
-        //clears the canvas
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    checkField(x, y) {
+        if (this.field[y][x] === 0) {
+            if (this.playerTurn) {
+                this.field[y][x] = 1;
+            } else {
+                this.field[y][x] = 2;
+            }
+            this.playerTurn = !this.playerTurn;
+            this.checkForEndOfGame();
+            if (this.win !== '') {
+                setTimeout(function () {
+                    game.status = false;
+                }, 700);
+            }
+        }
+    }
 
-        //draws header
-        this.context.font = '50px Arial';
-        this.context.fillStyle = '#000';
+    drawMenu() {
+        super.drawMenu();
+
         this.context.textAlign = 'center';
-        this.context.fillText(TicTacToe.name, this.canvas.width/2, 50, this.canvas.width);
+        this.context.font = this.canvas.height/30 + 'px Arial';
 
         //draws play against player button
         this.context.fillStyle = '#bbb';
-        this.context.fillRect(0, this.canvas.height*2/3 - 30, this.canvas.width, 40);
+        this.context.fillRect(0, this.canvas.height*3/6, this.canvas.width, this.canvas.height/30);
 
         //draws play against ai button
-        this.context.fillRect(0, this.canvas.height*5/6 - 30, this.canvas.width, 40);
-
-        //draws back to arcade menu button
-        this.context.fillRect(0, this.canvas.height-50, 80, 50);
+        this.context.fillRect(0, this.canvas.height*4/6, this.canvas.width, this.canvas.height/30);
 
         //draws play against player button text
-        this.context.font = '25px Arial';
         this.context.fillStyle = '#000';
-        this.context.fillText('1 vs 1 | Spieler gegen Spieler', this.canvas.width/2, this.canvas.height*2/3, this.canvas.width);
+        this.context.fillText('1 vs 1 | Player vs Player', this.canvas.width/2, this.canvas.height*3/6 + this.canvas.height/37, this.canvas.width);
 
         //draws play against ai button text
-        this.context.fillText('Einzelspieler | Spieler gegen KI', this.canvas.width/2, this.canvas.height*5/6, this.canvas.width);
+        this.context.fillText('Singleplayer | Player vs AI', this.canvas.width/2, this.canvas.height*4/6 + this.canvas.height/37, this.canvas.width);
 
-        //draws the winner text
-        if (this.win != null) {
-            if (this.win === 0) {
-                this.context.fillText('Es kam zu einem Unentschieden!', this.canvas.width / 2, this.canvas.height * 2 / 5);
-            } else if (this.ki) {
-                if (this.win === 1) {
-                    this.context.fillText('Sie haben gewonnen!', this.canvas.width / 2, this.canvas.height * 2 / 5);
+        //draw winner text
+        this.context.fillText(this.win, this.canvas.width / 2, this.canvas.height * 2 / 5);
+    }
+
+    clickEventHandler(e) {
+        super.clickEventHandler(e);
+        let rect = canvas.getBoundingClientRect();
+        if (!game.status) {
+            if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 0, canvas.height*3/6, canvas.width, canvas.height/30)) {
+                game.startGame(false);
+            } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 0, canvas.height*4/6, canvas.width, canvas.height/30)) {
+                game.startGame(true);
+            }
+        } else {
+            if (!(!game.playerTurn && game.ai)) {
+                for (let y=0; y<game.field.length; y++) {
+                    for (let x=0; x<game.field[y].length; x++) {
+                        if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, canvas.width/3*x + canvas.width/200, canvas.width/3*y + canvas.width/200, canvas.width/3 - canvas.width/100, canvas.width/3 - canvas.width/100)) {
+                            game.checkField(x, y);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    checkForEndOfGame() {
+        let winner = this.getWinner(this.field);
+        if (winner !== 0) {
+            if (this.ai) {
+                if (winner === 1) {
+                    this.win = "You Win!";
                 } else {
-                    this.context.fillText('Sie haben verloren!', this.canvas.width / 2, canvas.height * 2 / 5);
+                    this.win = "You Lose!";
                 }
             } else {
-                this.context.fillText('Spieler '+ this.win + ' hat gewonnen!', this.canvas.width / 2, this.canvas.height * 2 / 5);
-            }
-        }
-
-        //draws back to arcade menu button text
-        this.context.textAlign = 'left';
-        this.context.fillText('Zurück', 2, this.canvas.height - 20, this.canvas.width);
-    }
-
-
-    /**
-     * @description checks if a player has won the game
-     * @returns {int} 0 if the game is running - 1/2 if the according player has won
-     */
-    checkForWin() {
-        for (let p=1; p<3; p++){
-            for (let y=0; y<this.field.length; y++) {
-                if (this.field[y][0] === p && this.field[y][1] === p && this.field[y][2] === p) {
-                    return p;
-                }
-            }
-
-            for (let x=0; x<this.field.length; x++) {
-                if (this.field[0][x] === p && this.field[1][x] === p && this.field[2][x] === p) {
-                    return p;
-                }
-            }
-
-            if (this.field[0][0] === p && this.field[1][1] === p && this.field[2][2] === p) {
-                return p;
-            } else if (this.field[0][2] === p && this.field[1][1] === p && this.field[2][0] === p) {
-                return p;
-            }
-
-        }
-        return 0;
-    }
-
-    /**
-     * @description checks if all fields are filled
-     * @returns {boolean} true if all fields are filled
-     */
-    checkEndFieldFilled() {
-        let flag = true;
-        for (let y=0; y<this.field.length; y++) {
-            for (let x=0; x<this.field[y].length; x++) {
-                if (this.field[y][x] === 0) {
-                    flag = false;
-                }
-            }
-        }
-        return flag;
-    }
-
-    /**
-     * @description checks if the game has ended and calls the ki if it needs to move
-     */
-    checkEnd() {
-        if (this.checkForWin() !== 0) {
-            this.win = this.checkForWin();
-            this.time = Date.now();
-            this.inGame = false;
-            return;
-        }
-
-        if (this.checkEndFieldFilled()) {
-            this.win = 0;
-            this.time = Date.now();
-            this.inGame = false;
-            return;
-        }
-        if (this.ki && this.playersTurn === 2) {
-            this.cpu();
+                this.win = "Player " + winner + " Wins!";
+             }
+        } else if (this.getFreeTiles(this.field).length === 0) {
+            this.win = "Tie!";
+        } else if (this.ai && !this.playerTurn) {
+            this.aiTurn();
         }
     }
 
-    /**
-     * @description lets the ki know it needs to move
-     */
-    cpu() {
-        //searches for a possibility to win
-        //then looks if the opponent can win
-        for (let p=3; p>0; p--){
-            //checks rows for possible wins
-            for (let y=0; y<this.field.length; y++) {
-                if (this.field[y][0] === 0  && this.field[y][1] === p && this.field[y][2] === p) {
-                    this.checkField(0, y);
-                    return;
-                } else if (this.field[y][0] === p  && this.field[y][1] === 0 && this.field[y][2] === p) {
-                    this.checkField(1, y);
-                    return;
-                } else  if (this.field[y][0] === p  && this.field[y][1] === p && this.field[y][2] === 0) {
-                    this.checkField(2, y);
-                    return;
-                }
-            }
-            //checks columns for possible wins
-            for (let x=0; x<this.field.length; x++) {
-                if (this.field[0][x] === 0 && this.field[1][x] === p && this.field[2][x] === p) {
-                    this.checkField(x, 0);
-                    return;
-                } else if (this.field[0][x] === p && this.field[1][x] === 0 && this.field[2][x] === p) {
-                    this.checkField(x, 1);
-                    return;
-                } else if (this.field[0][x] === p && this.field[1][x] === p && this.field[2][x] === 0) {
-                    this.checkField(x, 2);
-                    return;
-                }
-            }
-            //checks diagonals for possible win
-            if (this.field[0][0] === 0 && this.field[1][1] === p && this.field[2][2] === p) {
-                this.checkField(0, 0);
-                return;
-            } else if (this.field[0][0] === p && this.field[1][1] === 0 && this.field[2][2] === p) {
-                this.checkField(1, 1);
-                return;
-            } else if (this.field[0][0] === p && this.field[1][1] === p && this.field[2][2] === 0) {
-                this.checkField(2, 2);
-                return;
-            } else if (this.field[0][2] === 0 && this.field[1][1] === p && this.field[2][0] === p) {
-                this.checkField(2, 0);
-                return;
-            } else if (this.field[0][2] === p && this.field[1][1] === 0 && this.field[2][0] === p) {
-                this.checkField(0, 0);
-                return;
-            } else if (this.field[0][2] === p && this.field[1][1] === p && this.field[2][0] === 0) {
-                this.checkField(0, 2);
-                return;
-            }
-        }
-        //places in the center if opponent goes for a corner
-        if (this.field[1][1] === 0 &&(this.field[0][0] === 1 || this.field[0][2] === 1 || this.field[2][0] === 1 || this.field[2][2] === 1)) {
-            this.checkField(1, 1);
-            return;
-        }
-        //goes for a corner if the opponent goes for the center
-        if (this.field[1][1] === 1) {
-            if (this.field[0][2] === 0) {
-                this.checkField(2, 0);
-                return;
-            } else if (this.field[0][0] === 0) {
-                this.checkField(0, 0);
-                return;
-            } else if (this.field[2][0] === 0) {
-                this.checkField(0, 2);
-                return;
-            } else if (this.field[2][2] === 0) {
-                this.checkField(2, 2);
-                return;
-            }
-        }
-        //goes for a not corner and not center tile if opponent has the corners of a diagonal
-        if ((this.field[0][0] === 1 && this.field[2][2] === 1) || (this.field[0][2] === 1 && this.field[2][0] === 1)) {
-            if (this.field[0][1] === 0) {
-                this.checkField(1, 0);
-                return;
-            } else if (this.field[2][1] === 0) {
-                this.checkField(1, 2);
-                return;
-            } else if (this.field[1][0] === 0) {
-                this.checkField(0, 1);
-                return;
-            } else if (this.field[1][2] === 0) {
-                this.checkField(1, 2);
-                return;
-            }
-
-        }
-        //goes for the middle tile if possible
-        if (this.field[1][1] === 0) {
-            this.checkField(1, 1);
-            return;
-        }
-
-        //goes for a adjacent corner if opponent neither goes for the center nor for a corner tile
-        for (let i=0; i<3; i=i+2) {
-            //checks rows
-            if (this.field[i][0] !== 2 && this.field[i][2] !== 2) {
-                if (this.field[i][1] === 1) {
-                    if (this.field[i][0] === 0) {
-                        this.checkField(0, i);
-                        return;
-                    } else if (this.field[i][2] === 0) {
-                        this.checkField(2, i);
-                        return;
-                    }
-                }
-            }
-            //check columns
-            if (this.field[0][i] !== 2 && this.field[2][i] !== 2) {
-                if (this.field[1][i] === 1) {
-                    if (this.field[0][i] === 0) {
-                        this.checkField(i, 0);
-                        return;
-                    } else if (this.field[2][i] === 0) {
-                        this.checkField(i, 2);
-                        return;
-                    }
-                }
-            }
-        }
-        //if no condition applies: choose a random free tile
-        let tile = this.getRandomTile(this.getFreeTiles());
-        this.checkField(tile.x, tile.y);
-
-    }
-    /**
-     * @description gets the cords of all free tiles
-     * @returns {map[]} returns an array of maps
-     */
-    getFreeTiles() {
+    getFreeTiles(field) {
         let freeTiles = [];
-        for (let y = 0; y<this.field.length; y++){
-            for (let x = 0; x<this.field[y].length; x++) {
-                if (this.field[y][x] === 0) {
+        for (let y = 0; y<field.length; y++){
+            for (let x = 0; x<field[y].length; x++) {
+                if (field[y][x] === 0) {
                     freeTiles.push({x: x, y: y});
                 }
             }
@@ -536,13 +232,83 @@ class TicTacToe extends Game{
         return freeTiles;
     }
 
-    /**
-     * inspired by https://developer.mozilla.org/de/docs/Web/JavaScript/Reference/Global_Objects/Math/math.random
-     * @param {map[]} tiles
-     * @returns {map} returns a random tile out of the tile array
-     */
-    getRandomTile(tiles) {
-        let index = Math.floor(Math.random() * tiles.length);
-        return tiles[index];
+    getWinner(field) {
+        for (let p=1; p<3; p++){
+            for (let y=0; y<field.length; y++) {
+                if (field[y][0] === p && field[y][1] === p && field[y][2] === p) {
+                    return p;
+                }
+            }
+
+            for (let x=0; x<field.length; x++) {
+                if (field[0][x] === p && field[1][x] === p && field[2][x] === p) {
+                    return p;
+                }
+            }
+
+            if (field[0][0] === p && field[1][1] === p && field[2][2] === p) {
+                return p;
+            } else if (field[0][2] === p && field[1][1] === p && field[2][0] === p) {
+                return p;
+            }
+
+        }
+        return 0;
+    }
+
+    aiTurn() {
+        let free = this.getFreeTiles(this.field);
+        let maxScore = {score: -2, depth: Infinity};
+        let move;
+        for (let i=0; i<free.length; i++) {
+            let field = cloneTwoDimensionalArray(this.field);
+            field[free[i].y][free[i].x] = 2;
+            let score = this.miniMax(field, false, 0);
+            field[free[i].y][free[i].x] = 0;
+            if (score.score > maxScore.score || (score.score === maxScore.score && score.depth < maxScore.depth)) {
+                maxScore = score;
+                move = free[i];
+            }
+        }
+        this.checkField(move.x, move.y);
+    }
+
+    miniMax(field, max, depth) {
+        let winner = this.getWinner(field);
+        let free = this.getFreeTiles(field);
+        let maxScore = {score: -2, depth: Infinity};
+        let minScore = {score: 2, depth: Infinity};
+        if (winner !== 0) {
+            if (winner === 1) {
+                return {score: -1, depth: depth};
+            } else {
+                return {score: 1, depth: depth};
+            }
+        } else if (free.length === 0) {
+            return {score: 0, depth: depth};
+        }
+        let field2 = cloneTwoDimensionalArray(field);
+
+        if (max) {
+            for (let i=0; i<free.length; i++) {
+                field2[free[i].y][free[i].x] = 2;
+                let score = this.miniMax(field2, false, depth + 1);
+                field2[free[i].y][free[i].x] = 0;
+                if (score.score > maxScore.score || (score.score === maxScore.score && score.depth < maxScore.depth)) {
+                    maxScore = score;
+                }
+            }
+            return maxScore;
+        } else {
+            for (let i=0; i<free.length; i++) {
+                field2[free[i].y][free[i].x] = 1;
+                let score = this.miniMax(field2, true, depth + 1);
+                field2[free[i].y][free[i].x] = 0;
+                if (score.score < minScore.score || (score.score === minScore.score && score.depth < minScore.depth)) {
+                    minScore = score;
+                }
+            }
+            return minScore;
+        }
     }
 }
