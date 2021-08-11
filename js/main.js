@@ -19,6 +19,6 @@ windowResizeEventHandler();
 //global variable because it is used in listeners
 let game;
 //name needs to be arcade because of listeners
-let arcade = new Arcade([Dice, TicTacToe], canvas, ctx);
+let arcade = new Arcade([Dice, TicTacToe, Minesweeper], canvas, ctx);
 //draws the arcade menu for the first time
 arcade.draw();
