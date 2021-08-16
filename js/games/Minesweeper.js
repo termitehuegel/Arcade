@@ -19,8 +19,8 @@ class Minesweeper extends Game {
     field;
     flagCount;
     start;
-    win;
-    score;
+    win = "";
+    score = -1;
     shown;
     lost;
 
@@ -49,11 +49,18 @@ class Minesweeper extends Game {
     }
 
     drawGame() {
-        //TODO NUMBER SIZES FOR NORMAL AND EASY
         this.context.fillStyle = '#666';
         this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
         this.context.textAlign = 'center';
-        this.context.font = this.canvas.height/30 + 'px Arial';
+        //sets the font size for the difficulty
+        if (this.hardness === 2) {
+            this.context.font = this.canvas.height/30 + 'px Arial';
+        } else if (this.hardness === 1) {
+            this.context.font = this.canvas.height/20 + 'px Arial';
+        } else {
+            this.context.font = this.canvas.height/10 + 'px Arial';
+        }
+
 
         for (let y = 0; y<this.field.length; y++) {
             for (let x = 0; x<this.field.length; x++) {
@@ -64,7 +71,18 @@ class Minesweeper extends Game {
                     if (this.field[y][x].value > 0) {
                         //draws numbers of uncovered tiles
                         this.context.fillStyle = '#000';
-                        this.context.fillText(this.field[y][x].value, this.canvas.width/45 + x*this.canvas.width/Minesweeper.hardness[this.hardness].fieldSize, this.canvas.width/27 + y*this.canvas.width/Minesweeper.hardness[this.hardness].fieldSize);
+                        switch (this.hardness) {
+                            case 2:
+                                this.context.fillText(this.field[y][x].value, this.canvas.width/45 + x*this.canvas.width/Minesweeper.hardness[this.hardness].fieldSize, this.canvas.width/27 + y*this.canvas.width/Minesweeper.hardness[this.hardness].fieldSize);
+                                break;
+                            case 1:
+                                this.context.fillText(this.field[y][x].value, this.canvas.width/35 + x*this.canvas.width/Minesweeper.hardness[this.hardness].fieldSize, this.canvas.width/21 + y*this.canvas.width/Minesweeper.hardness[this.hardness].fieldSize);
+                                break;
+                            case 0:
+                                this.context.fillText(this.field[y][x].value, this.canvas.width/22 + x*this.canvas.width/Minesweeper.hardness[this.hardness].fieldSize, this.canvas.width/12 + y*this.canvas.width/Minesweeper.hardness[this.hardness].fieldSize);
+                                break;
+                        }
+
                     }
                 } else {
                     //draws not uncovered tiles
@@ -103,13 +121,31 @@ class Minesweeper extends Game {
 
         //draws easy button text
         this.context.fillStyle = '#000';
-        this.context.fillText('Einfach', this.canvas.width/2, this.canvas.height*5/9, this.canvas.width);
+
+        this.context.textAlign = 'left';
+        if (this.score < 0) {
+            this.context.fillText('Score: ---', 0, this.canvas.height / 4);
+        } else {
+            this.context.fillText('Score: ' + this.score, 0, this.canvas.height / 4);
+        }
+
+        this.context.textAlign = 'right';
+        if (localStorage.getItem('MinesweeperHighscore' + this.hardness) === "" || localStorage.getItem('MinesweeperHighscore' + this.hardness) == null) {
+            this.context.fillText('Highscore: ---', this.canvas.width, this.canvas.height / 4);
+        } else {
+            this.context.fillText('Highscore: ' + localStorage.getItem('MinesweeperHighscore' + this.hardness), this.canvas.width, this.canvas.height / 4);
+        }
+
+
+        this.context.textAlign = 'center';
+
+        this.context.fillText('Easy', this.canvas.width/2, this.canvas.height*5/9, this.canvas.width);
 
         //draws medium button text
-        this.context.fillText('Mittel', this.canvas.width/2, this.canvas.height*6/9, this.canvas.width);
+        this.context.fillText('Normal', this.canvas.width/2, this.canvas.height*6/9, this.canvas.width);
 
         //draws hard button text
-        this.context.fillText('Schwer', this.canvas.width/2, this.canvas.height*7/9, this.canvas.width);
+        this.context.fillText('Hard', this.canvas.width/2, this.canvas.height*7/9, this.canvas.width);
 
         //draws the winner text
         this.context.fillText(this.win, this.canvas.width / 2, this.canvas.height * 2 / 5);
@@ -182,7 +218,7 @@ class Minesweeper extends Game {
 
     showTile(x, y) {
         //can't uncover flagged or already uncovered tiles
-        if (!this.field[y][x].show && !this.field[y][x].show) {
+        if (!this.field[y][x].show && !this.field[y][x].flag) {
             //starts the timer
             if (!this.start) {
                 this.start = Date.now();
@@ -212,15 +248,28 @@ class Minesweeper extends Game {
                 }
             }
             //wins if all tiles that aren't bombs were uncovered
-            if (this.shown === Minesweeper.hardness[this.hardness].tileCount - Minesweeper.hardness[this.hardness].bombCount) {
+            if (this.shown === Minesweeper.hardness[this.hardness].fieldSize*Minesweeper.hardness[this.hardness].fieldSize - Minesweeper.hardness[this.hardness].bombCount) {
                 this.score = Math.floor((Date.now() - this.start)/1000);
+                if (this.score > localStorage.getItem('MinesweeperHighscore' + this.hardness)) {
+                    localStorage.setItem('MinesweeperHighscore' + this.hardness, this.score);
+                }
                 setTimeout(function () {
-                    this.status = false;
+                    game.status = false;
                 }, 700);
             }
         }
     }
 
+
+    registerEventHandlers() {
+        super.registerEventHandlers();
+        this.canvas.addEventListener('contextmenu', this.contextEventHandler);
+    }
+
+    unloadEventHandlers() {
+        super.unloadEventHandlers();
+        this.canvas.removeEventListener('contextmenu', this.contextEventHandler);
+    }
 
     clickEventHandler(e) {
         super.clickEventHandler(e);
@@ -234,9 +283,32 @@ class Minesweeper extends Game {
                 game.startGame(2)
             }
         } else {
-
+            for (let y=0; y<Minesweeper.hardness[game.hardness].fieldSize; y++) {
+                for (let x=0; x<Minesweeper.hardness[game.hardness].fieldSize; x++) {
+                    if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, canvas.width/200 + x*canvas.width/Minesweeper.hardness[game.hardness].fieldSize, canvas.width/200 + y*canvas.width/Minesweeper.hardness[game.hardness].fieldSize, canvas.width/Minesweeper.hardness[game.hardness].fieldSize - canvas.width/100, canvas.width/Minesweeper.hardness[game.hardness].fieldSize - canvas.width/100)) {
+                        game.showTile(x, y);
+                        break;
+                    }
+                }
+            }
         }
+    }
 
+
+
+    contextEventHandler(e) {
+        e.preventDefault();
+        if (game.status) {
+            let rect = canvas.getBoundingClientRect();
+            for (let y=0; y<Minesweeper.hardness[game.hardness].fieldSize; y++) {
+                for (let x=0; x<Minesweeper.hardness[game.hardness].fieldSize; x++) {
+                    if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, canvas.width/200 + x*canvas.width/Minesweeper.hardness[game.hardness].fieldSize, canvas.width/200 + y*canvas.width/Minesweeper.hardness[game.hardness].fieldSize, canvas.width/Minesweeper.hardness[game.hardness].fieldSize - canvas.width/100, canvas.width/Minesweeper.hardness[game.hardness].fieldSize - canvas.width/100)) {
+                        game.flagTile(x, y);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
 
