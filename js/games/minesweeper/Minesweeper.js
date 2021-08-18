@@ -44,6 +44,13 @@ class Minesweeper extends Game {
         super.loadImages();
     }
 
+    loadSounds() {
+        this.soundExplosion = new Audio('audio/minesweeper/explosion.mp3');
+        this.soundFlagPlace = new Audio('audio/minesweeper/flagPlace.mp3');
+        this.soundFlagRemove = new Audio('audio/minesweeper/flagRemove.mp3');
+        super.loadSounds();
+    }
+
     update() {
         super.update();
     }
@@ -208,9 +215,11 @@ class Minesweeper extends Game {
 
     flagTile(x, y) {
         if (this.field[y][x].flag) {
+            this.soundFlagRemove.play();
             this.flagCount--;
             this.field[y][x].flag = false;
         } else if (this.flagCount < Minesweeper.hardness[this.hardness].bombCount) {
+            this.soundFlagPlace.play();
             this.flagCount++;
             this.field[y][x].flag = true;
         }
@@ -226,12 +235,14 @@ class Minesweeper extends Game {
             if (this.field[y][x].value === -1) {
                 //lets the player loose if he uncovers a bomb
                 this.lost = true;
+                this.soundExplosion.play();
                 setTimeout( function () {
                     game.status = false;
                     game.win = 'YOU LOST!';
                 }, 700);
             } else if (this.field[y][x].value > 0) {
                 //uncovers a tile
+                this.soundClick.play();
                 this.shown++;
                 this.field[y][x].show = true;
             } else {
@@ -254,6 +265,7 @@ class Minesweeper extends Game {
                     localStorage.setItem('MinesweeperHighscore' + this.hardness, this.score);
                 }
                 setTimeout(function () {
+                    game.soundWin.play();
                     game.status = false;
                 }, 700);
             }
@@ -280,7 +292,7 @@ class Minesweeper extends Game {
             } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 0, canvas.height*6/9 - canvas.height/37, canvas.width, canvas.height/30)) {
                 game.startGame(1);
             } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 0, canvas.height*7/9 - canvas.height/37, canvas.width, canvas.height/30)) {
-                game.startGame(2)
+                game.startGame(2);
             }
         } else {
             for (let y=0; y<Minesweeper.hardness[game.hardness].fieldSize; y++) {
