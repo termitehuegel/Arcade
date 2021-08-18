@@ -103,6 +103,7 @@ class Game {
      */
     loadSounds() {
         this.soundClick = new Audio('audio/arcade/click.mp3');
+        this.soundWin = new Audio('audio/arcade/win.mp3');
     }
 
     /**
