@@ -36,6 +36,7 @@ class Arcade {
         this.index = 0;
         this.canvas = canvas;
         this.context = context;
+        this.soundClick = new Audio('audio/arcade/click.mp3');
 
         canvas.addEventListener('click', this.clickEventHandler);
         document.addEventListener('keyup', this.keyEventHandler);
@@ -144,6 +145,7 @@ class Arcade {
         if (typeof this.games[this.index + difference] === 'undefined') {
             return false;
         }
+        this.soundClick.play();
         this.index = this.index + difference;
         this.draw();
         return true;
@@ -154,6 +156,7 @@ class Arcade {
      * @constructs Game
      */
     play() {
+        this.soundClick.play();
         //removes Arcade Event Handlers while game is running
         canvas.removeEventListener('click', this.clickEventHandler);
         document.removeEventListener('keyup', this.keyEventHandler);

@@ -42,6 +42,7 @@ class Game {
      * @description used to end the game and return to arcade
      */
     end() {
+        game.soundClick.play();
         this.unloadEventHandlers();
         this.arcade.end();
     }
@@ -51,6 +52,7 @@ class Game {
      */
     startGame() {
         this.status = true;
+        this.soundClick.play();
     }
 
     /**
@@ -99,7 +101,9 @@ class Game {
     /**
      * @description loads sounds
      */
-    loadSounds() {}
+    loadSounds() {
+        this.soundClick = new Audio('audio/arcade/click.mp3');
+    }
 
     /**
      * @description handles mouse events
