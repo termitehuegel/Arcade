@@ -147,6 +147,7 @@ class TicTacToe extends Game {
      */
     checkField(x, y) {
         if (this.field[y][x] === 0) {
+            this.soundClick.play();
             if (this.playerTurn) {
                 this.field[y][x] = 1;
             } else {
@@ -156,6 +157,18 @@ class TicTacToe extends Game {
             this.checkForEndOfGame();
             if (this.win !== '') {
                 setTimeout(function () {
+                    let winner = game.getWinner(game.field);
+                    if (game.ai){
+                        if (winner === 1) {
+                            game.soundWin.play();
+                        } else if (winner === 2) {
+                            game.soundLose.play();
+                        } else {
+                            game.soundTie.play();
+                        }
+                    } else {
+                        game.soundTie.play();
+                    }
                     game.status = false;
                 }, 700);
             }
