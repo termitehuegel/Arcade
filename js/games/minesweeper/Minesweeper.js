@@ -237,9 +237,10 @@ class Minesweeper extends Game {
                 this.lost = true;
                 this.soundExplosion.play();
                 setTimeout( function () {
+                    game.soundLose.play();
                     game.status = false;
                     game.win = 'YOU LOST!';
-                }, 700);
+                }, 800);
             } else if (this.field[y][x].value > 0) {
                 //uncovers a tile
                 this.soundClick.play();
