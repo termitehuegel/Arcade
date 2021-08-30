@@ -37,6 +37,10 @@ class Arcade {
         this.canvas = canvas;
         this.context = context;
         this.soundClick = new Audio('audio/arcade/click.mp3');
+        this.music = new Audio('audio/arcade/music.mp3');
+        this.music.loop = true;
+        this.music.volume = 0.05;
+        this.music.play();
 
         canvas.addEventListener('click', this.clickEventHandler);
         document.addEventListener('keyup', this.keyEventHandler);
