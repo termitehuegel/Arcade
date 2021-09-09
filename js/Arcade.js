@@ -44,7 +44,6 @@ class Arcade {
         this.music = new Audio('audio/arcade/music.mp3');
         this.music.loop = true;
         this.music.volume = 0.05;
-        this.music.play();
 
         canvas.addEventListener('click', this.clickEventHandler);
         document.addEventListener('keyup', this.keyEventHandler);
@@ -56,6 +55,8 @@ class Arcade {
      * @param e {MouseEvent}
      */
     clickEventHandler(e) {
+        //because of chromes autoplay feature music needs to be started after an interaction
+        arcade.updateMusic();
         let rect = canvas.getBoundingClientRect();
         ctx.font = canvas.height/10 + 'px Arial';
         if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 0, canvas.height*2/3, canvas.width, canvas.height/30)) {
@@ -108,6 +109,14 @@ class Arcade {
         }
     }
 
+    updateMusic() {
+        if (this.options.music) {
+            this.music.play();
+        } else {
+            this.music.pause();
+        }
+    }
+
     /**
      * @description draws the Arcade Menu
      */
@@ -153,7 +162,9 @@ class Arcade {
         if (typeof this.games[this.index + difference] === 'undefined') {
             return false;
         }
-        this.soundClick.play();
+        if (this.options.sfx) {
+            this.soundClick.play();
+        }
         this.index = this.index + difference;
         this.draw();
         return true;
@@ -164,7 +175,9 @@ class Arcade {
      * @constructs Game
      */
     play() {
-        this.soundClick.play();
+        if (this.options.sfx) {
+            this.soundClick.play();
+        }
         //removes Arcade Event Handlers while game is running
         canvas.removeEventListener('click', this.clickEventHandler);
         document.removeEventListener('keyup', this.keyEventHandler);
