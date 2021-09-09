@@ -55,8 +55,6 @@ class Arcade {
      * @param e {MouseEvent}
      */
     clickEventHandler(e) {
-        //because of chromes autoplay feature music needs to be started after an interaction
-        arcade.updateMusic();
         let rect = canvas.getBoundingClientRect();
         ctx.font = canvas.height/10 + 'px Arial';
         if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 0, canvas.height*2/3, canvas.width, canvas.height/30)) {
@@ -65,6 +63,13 @@ class Arcade {
             arcade.changeGame(1);
         } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top,0, canvas.height*2/5 - canvas.height/17, ctx.measureText('←').width, canvas.height/15)) {
             arcade.changeGame(-1);
+        } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top,canvas.width/8, canvas.height*6/7 - canvas.height/37, canvas.height/5, canvas.height/20)) {
+            arcade.options.music = !arcade.options.music;
+            arcade.updateMusic();
+            arcade.draw();
+        } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top,canvas.width*6/8, canvas.height*6/7 - canvas.height/37, canvas.height/5, canvas.height/20)) {
+            arcade.options.sfx = !arcade.options.sfx;
+            arcade.draw();
         }
     }
 
@@ -138,7 +143,27 @@ class Arcade {
         this.context.fillStyle = '#000';
         this.context.fillText('Play', this.canvas.width/2, this.canvas.height*2/3 + this.canvas.height/37, this.canvas.width);
 
+        //draw options
+        this.context.fillStyle = '#000';
+        this.context.fillText('Music', this.canvas.width/6 , this.canvas.height*6/7, this.canvas.width);
+        this.context.fillText('SFX', this.canvas.width*5/6 , this.canvas.height*6/7, this.canvas.width);
+        this.context.fillRect(this.canvas.width/6 + this.context.measureText('Music').width, this.canvas.height*6/7 - this.canvas.height/37, this.canvas.height/30, this.canvas.height/30);
+        this.context.fillRect(this.canvas.width*5/6 + this.context.measureText('SFX').width, this.canvas.height*6/7 - this.canvas.height/37, this.canvas.height/30, this.canvas.height/30);
+        if (this.options.music) {
+            this.context.fillStyle = '#0f0';
+        } else {
+            this.context.fillStyle = '#f00';
+        }
+        this.context.fillRect(this.canvas.width/6 + this.context.measureText('Music').width + this.canvas.height/400, this.canvas.height*6/7 - this.canvas.height/37 + this.canvas.height/400, this.canvas.height/35, this.canvas.height/35);
+        if (this.options.sfx) {
+            this.context.fillStyle = '#0f0';
+        } else {
+            this.context.fillStyle = '#f00';
+        }
+        this.context.fillRect(this.canvas.width*5/6 + this.context.measureText('SFX').width + this.canvas.height/400, this.canvas.height*6/7 - this.canvas.height/37 + this.canvas.height/400, this.canvas.height/35, this.canvas.height/35);
+
         //draws arrow right
+        this.context.fillStyle = '#000';
         if (typeof this.games[this.index + 1] !== 'undefined') {
             this.context.textAlign = 'right';
             this.context.font = this.canvas.height/10 + 'px Arial';
