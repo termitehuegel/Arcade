@@ -24,6 +24,10 @@ class Arcade {
      * @type{int}
      */
     updateInterval;
+    /**
+     * @type {{music: boolean, sfx: boolean}}
+     */
+    options = {music: true, sfx: true};
 
     /**
      * @constructor
