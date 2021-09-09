@@ -1,5 +1,3 @@
-
-
 class Minesweeper extends Game {
     static name = 'Minesweeper';
     static hardness = [

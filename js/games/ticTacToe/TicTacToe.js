@@ -1,6 +1,5 @@
-//TODO Documentation and Comments
 /**
- * @author ternitehuegel
+ * @author termitehuegel
  * @extends Game
  */
 class TicTacToe extends Game {
