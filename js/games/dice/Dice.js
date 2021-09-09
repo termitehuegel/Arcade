@@ -7,9 +7,11 @@ class Dice extends Game {
     playerNumber;
     aiNumber;
     stopped;
+    win = "";
 
     startGame() {
         this.stopped = false;
+        this.win = '';
         super.startGame();
     }
 
@@ -34,9 +36,11 @@ class Dice extends Game {
      * @description stopps the dies
      */
     stop() {
+        this.playSound(this.sounds.click);
         this.stopped = true;
         this.roll();
         setTimeout(function () {
+            game.winner();
             game.status = false;
         }, 700);
     }
@@ -47,13 +51,15 @@ class Dice extends Game {
      */
     winner() {
         if (this.playerNumber > this.aiNumber) {
-            return 'You Win!';
+            this.playSound(this.sounds.win);
+            this.win = 'You Win!';
         } else if (this.playerNumber < this.aiNumber) {
-            return 'You Lose!';
+            this.playSound(this.sounds.lose);
+            this.win = 'You Lose!';
         } else if (this.aiNumber != null && this.playerNumber != null){
-            return 'Tie!';
+            this.playSound(this.sounds.tie);
+            this.win = 'Tie!';
         }
-        return '';
     }
 
     drawGame() {
@@ -91,7 +97,7 @@ class Dice extends Game {
         this.context.font = this.canvas.height/30 + 'px Arial';
 
         //draw winner text
-        this.context.fillText(this.winner(), this.canvas.width / 2, this.canvas.height * 2 / 5);
+        this.context.fillText(this.win, this.canvas.width / 2, this.canvas.height * 2 / 5);
 
         //draws play button
         this.context.fillStyle = '#bbb';

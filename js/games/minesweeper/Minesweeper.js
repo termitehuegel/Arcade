@@ -1,5 +1,3 @@
-
-
 class Minesweeper extends Game {
     static name = 'Minesweeper';
     static hardness = [
@@ -42,6 +40,13 @@ class Minesweeper extends Game {
         this.flag = new Image(this.canvas.width, this.canvas.width);
         this.flag.src = './img/minesweeper/flag.png';
         super.loadImages();
+    }
+
+    loadSounds() {
+        this.sounds.explosion = new Audio('audio/minesweeper/explosion.mp3');
+        this.sounds.flagPlace = new Audio('audio/minesweeper/flagPlace.mp3');
+        this.sounds.flagRemove = new Audio('audio/minesweeper/flagRemove.mp3');
+        super.loadSounds();
     }
 
     update() {
@@ -208,9 +213,11 @@ class Minesweeper extends Game {
 
     flagTile(x, y) {
         if (this.field[y][x].flag) {
+            this.playSound(this.sounds.flagRemove);
             this.flagCount--;
             this.field[y][x].flag = false;
         } else if (this.flagCount < Minesweeper.hardness[this.hardness].bombCount) {
+            this.playSound(this.sounds.flagPlace);
             this.flagCount++;
             this.field[y][x].flag = true;
         }
@@ -226,12 +233,15 @@ class Minesweeper extends Game {
             if (this.field[y][x].value === -1) {
                 //lets the player loose if he uncovers a bomb
                 this.lost = true;
+                this.playSound(this.sounds.explosion);
                 setTimeout( function () {
+                    game.playSound(game.sounds.lose);
                     game.status = false;
                     game.win = 'YOU LOST!';
-                }, 700);
+                }, 800);
             } else if (this.field[y][x].value > 0) {
                 //uncovers a tile
+                this.playSound(this.sounds.click);
                 this.shown++;
                 this.field[y][x].show = true;
             } else {
@@ -254,6 +264,7 @@ class Minesweeper extends Game {
                     localStorage.setItem('MinesweeperHighscore' + this.hardness, this.score);
                 }
                 setTimeout(function () {
+                    game.playSound(game.sounds.win);
                     game.status = false;
                 }, 700);
             }
@@ -280,7 +291,7 @@ class Minesweeper extends Game {
             } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 0, canvas.height*6/9 - canvas.height/37, canvas.width, canvas.height/30)) {
                 game.startGame(1);
             } else if (clickInRect(e.clientX - rect.left, e.clientY - rect.top, 0, canvas.height*7/9 - canvas.height/37, canvas.width, canvas.height/30)) {
-                game.startGame(2)
+                game.startGame(2);
             }
         } else {
             for (let y=0; y<Minesweeper.hardness[game.hardness].fieldSize; y++) {

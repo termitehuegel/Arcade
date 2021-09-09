@@ -1,6 +1,5 @@
-//TODO Documentation and Comments
 /**
- * @author ternitehuegel
+ * @author termitehuegel
  * @extends Game
  */
 class TicTacToe extends Game {
@@ -147,6 +146,7 @@ class TicTacToe extends Game {
      */
     checkField(x, y) {
         if (this.field[y][x] === 0) {
+            this.playSound(this.sounds.click);
             if (this.playerTurn) {
                 this.field[y][x] = 1;
             } else {
@@ -156,6 +156,18 @@ class TicTacToe extends Game {
             this.checkForEndOfGame();
             if (this.win !== '') {
                 setTimeout(function () {
+                    let winner = game.getWinner(game.field);
+                    if (game.ai){
+                        if (winner === 1) {
+                            game.playSound(game.sounds.win);
+                        } else if (winner === 2) {
+                            game.playSound(game.sounds.lose);
+                        } else {
+                            game.playSound(game.sounds.tie);
+                        }
+                    } else {
+                        game.playSound(game.sounds.tie);
+                    }
                     game.status = false;
                 }, 700);
             }
