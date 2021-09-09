@@ -27,7 +27,7 @@ class Arcade {
     /**
      * @type {{music: boolean, sfx: boolean}}
      */
-    options = {music: true, sfx: true};
+    options = {music: false, sfx: true};
 
     /**
      * @constructor

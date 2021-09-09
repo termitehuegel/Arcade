@@ -36,7 +36,7 @@ class Dice extends Game {
      * @description stopps the dies
      */
     stop() {
-        this.soundClick.play();
+        this.playSound(this.sounds.click);
         this.stopped = true;
         this.roll();
         setTimeout(function () {
@@ -51,13 +51,13 @@ class Dice extends Game {
      */
     winner() {
         if (this.playerNumber > this.aiNumber) {
-            this.soundWin.play();
+            this.playSound(this.sounds.win);
             this.win = 'You Win!';
         } else if (this.playerNumber < this.aiNumber) {
-            this.soundLose.play();
+            this.playSound(this.sounds.lose);
             this.win = 'You Lose!';
         } else if (this.aiNumber != null && this.playerNumber != null){
-            this.soundTie.play();
+            this.playSound(this.sounds.tie);
             this.win = 'Tie!';
         }
     }

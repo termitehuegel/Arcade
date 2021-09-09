@@ -15,6 +15,11 @@ class Game {
      * @type {boolean} the status of the game
      */
     status;
+    /**
+     * a map of all sounds
+     * @type {}
+     */
+    sounds = {};
 
     /**
      * @constructor
@@ -42,7 +47,7 @@ class Game {
      * @description used to end the game and return to arcade
      */
     end() {
-        game.soundClick.play();
+        this.playSound(this.sounds.click);
         this.unloadEventHandlers();
         this.arcade.end();
     }
@@ -52,7 +57,7 @@ class Game {
      */
     startGame() {
         this.status = true;
-        this.soundClick.play();
+        this.playSound(this.sounds.click);
     }
 
     /**
@@ -102,10 +107,16 @@ class Game {
      * @description loads sounds
      */
     loadSounds() {
-        this.soundClick = new Audio('audio/arcade/click.mp3');
-        this.soundWin = new Audio('audio/arcade/win.mp3');
-        this.soundLose = new Audio('audio/arcade/lose.mp3');
-        this.soundTie = new Audio('audio/arcade/tie.mp3');
+        this.sounds.click = new Audio('audio/arcade/click.mp3');
+        this.sounds.win = new Audio('audio/arcade/win.mp3');
+        this.sounds.lose = new Audio('audio/arcade/lose.mp3');
+        this.sounds.tie = new Audio('audio/arcade/tie.mp3');
+    }
+
+    playSound(sound) {
+        if (this.arcade.options.sfx) {
+            sound.play();
+        }
     }
 
     /**

@@ -45,9 +45,9 @@ class Minesweeper extends Game {
     }
 
     loadSounds() {
-        this.soundExplosion = new Audio('audio/minesweeper/explosion.mp3');
-        this.soundFlagPlace = new Audio('audio/minesweeper/flagPlace.mp3');
-        this.soundFlagRemove = new Audio('audio/minesweeper/flagRemove.mp3');
+        this.sounds.explosion = new Audio('audio/minesweeper/explosion.mp3');
+        this.sounds.flagPlace = new Audio('audio/minesweeper/flagPlace.mp3');
+        this.sounds.flagRemove = new Audio('audio/minesweeper/flagRemove.mp3');
         super.loadSounds();
     }
 
@@ -215,11 +215,11 @@ class Minesweeper extends Game {
 
     flagTile(x, y) {
         if (this.field[y][x].flag) {
-            this.soundFlagRemove.play();
+            this.playSound(this.sounds.flagRemove);
             this.flagCount--;
             this.field[y][x].flag = false;
         } else if (this.flagCount < Minesweeper.hardness[this.hardness].bombCount) {
-            this.soundFlagPlace.play();
+            this.playSound(this.sounds.flagPlace);
             this.flagCount++;
             this.field[y][x].flag = true;
         }
@@ -235,15 +235,15 @@ class Minesweeper extends Game {
             if (this.field[y][x].value === -1) {
                 //lets the player loose if he uncovers a bomb
                 this.lost = true;
-                this.soundExplosion.play();
+                this.playSound(this.sounds.explosion);
                 setTimeout( function () {
-                    game.soundLose.play();
+                    game.playSound(game.sounds.lose);
                     game.status = false;
                     game.win = 'YOU LOST!';
                 }, 800);
             } else if (this.field[y][x].value > 0) {
                 //uncovers a tile
-                this.soundClick.play();
+                this.playSound(this.sounds.click);
                 this.shown++;
                 this.field[y][x].show = true;
             } else {
@@ -266,7 +266,7 @@ class Minesweeper extends Game {
                     localStorage.setItem('MinesweeperHighscore' + this.hardness, this.score);
                 }
                 setTimeout(function () {
-                    game.soundWin.play();
+                    game.playSound(game.sounds.win);
                     game.status = false;
                 }, 700);
             }
